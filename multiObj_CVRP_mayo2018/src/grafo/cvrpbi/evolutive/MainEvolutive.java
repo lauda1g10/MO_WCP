@@ -76,7 +76,7 @@ public class MainEvolutive {
             // Read instance
             System.out.println("\nReading instance: " + inst);
             CVRPInstance instance = new CVRPInstance(dir + File.separator + inst);
-
+/*
             // First create the problem
             CVRPProblem problem = new CVRPProblem(instance);
 
@@ -113,7 +113,7 @@ public class MainEvolutive {
 //                writeStatsToFile(bestSolutions, instance.getName(), outDir);
                 writeStatsToFile(results, instance.getName(), outDir);
             }
-
+*/
         }
 
     }
