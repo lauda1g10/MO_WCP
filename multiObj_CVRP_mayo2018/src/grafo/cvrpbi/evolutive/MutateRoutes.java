@@ -4,7 +4,6 @@ import grafo.optilib.tools.RandomManager;
 import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.solution.PermutationSolution;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
 
