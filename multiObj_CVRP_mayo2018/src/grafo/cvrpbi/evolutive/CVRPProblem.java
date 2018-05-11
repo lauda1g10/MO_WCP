@@ -18,7 +18,7 @@ public class CVRPProblem<T extends Constructive<WCPInstance, WCPSolution>> exten
     public WCPSolution testSol;
 
     protected final JavaRandomGenerator random = new JavaRandomGenerator();
-    protected final String ROUTES = "Routes";
+    public static final String ROUTES = "Routes";
 
     protected WCPInstance instance;
     protected T constructive;
