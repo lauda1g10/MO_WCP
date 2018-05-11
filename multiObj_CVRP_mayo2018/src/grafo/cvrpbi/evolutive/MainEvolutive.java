@@ -1,6 +1,11 @@
 package grafo.cvrpbi.evolutive;
 
+import grafo.cvrpbi.constructive.C1;
 import grafo.cvrpbi.structure.CVRPInstance;
+import grafo.cvrpbi.structure.WCPInstance;
+import grafo.cvrpbi.structure.WCPSolution;
+import grafo.optilib.metaheuristics.Constructive;
+import grafo.optilib.tools.RandomManager;
 import org.uma.jmetal.algorithm.multiobjective.nsgaii.NSGAII;
 import org.uma.jmetal.operator.impl.crossover.PMXCrossover;
 import org.uma.jmetal.operator.impl.mutation.PermutationSwapMutation;
@@ -27,6 +32,9 @@ import static grafo.cvrpbi.evolutive.UtilityMethods.*;
 public class MainEvolutive {
 
     public static void main(String[] args) {
+
+        RandomManager.setSeed(1234);
+
         args = new String[1];
         args[0] = "nsgaii.properties";
 
@@ -55,10 +63,30 @@ public class MainEvolutive {
 
         // Genetic operators:
         PMXCrossover crossover = new PMXCrossover(cxProb);
-        PermutationSwapMutation<Integer> mutation = new PermutationSwapMutation<>(mutProb);
+        MutateRoutes mutation = new MutateRoutes(mutProb);
         BinaryTournamentSelection<PermutationSolution<Integer>> selection = new BinaryTournamentSelection<>(new RankingAndCrowdingDistanceComparator<>()) ;
         DominanceComparator<PermutationSolution<Integer>> dominanceComparator = new DominanceComparator();
         SequentialSolutionListEvaluator<PermutationSolution<Integer>> evaluator = new SequentialSolutionListEvaluator();
+
+
+        // Constructive algorithm (for initial population)
+        Constructive<WCPInstance, WCPSolution> constructive;
+        String constructiveId = props.getProperty("ConstructiveAlgorithm");
+        if (constructiveId != null) {
+            switch (constructiveId) {
+                case "C1":
+                    double alpha = Double.valueOf(props.getProperty("Alpha"));
+                    constructive = new C1(alpha);
+                    break;
+                default:
+                    // Default constructive algorithm
+                    constructive = new C1(0.5);
+            }
+        } else {
+            // Default constructive algorithm
+            constructive = new C1(0.5);
+        }
+
 
         for (String inst : instances) {
 
@@ -75,10 +103,10 @@ public class MainEvolutive {
 
             // Read instance
             System.out.println("\nReading instance: " + inst);
-            CVRPInstance instance = new CVRPInstance(dir + File.separator + inst);
-/*
-            // First create the problem
-            CVRPProblem problem = new CVRPProblem(instance);
+            WCPInstance instance = new WCPInstance(dir + File.separator + inst);
+
+            // Create the problem
+            CVRPProblem problem = new CVRPProblem(instance,constructive);
 
             // Solutions
             ArrayList<PermutationSolution<Integer>> bestSolutions = new ArrayList<>();
@@ -91,16 +119,14 @@ public class MainEvolutive {
                 NSGAII<PermutationSolution<Integer>> algorithm = new NSGAII<>(problem,generations,
                         population,crossover,mutation,selection,dominanceComparator,evaluator);
 
-
                 algorithm.run();
 
                 // Collect solutions
                 bestSolutions.addAll(algorithm.getResult());
 
                 // Print results of this run:
-                System.out.println("Distance\tLatency\tNClient\tProfit\tSolution");
                 for (PermutationSolution<Integer> s : algorithm.getResult()) {
-                    System.out.println(solutionToString(s));
+                    System.out.println(problem.convert(s));
                 }
 
             }
@@ -113,7 +139,7 @@ public class MainEvolutive {
 //                writeStatsToFile(bestSolutions, instance.getName(), outDir);
                 writeStatsToFile(results, instance.getName(), outDir);
             }
-*/
+
         }
 
     }
