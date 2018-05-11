@@ -182,6 +182,7 @@ public class WCPSolution implements Solution {
 	}
 
 	public void updateLongestRoute(int route, double newDistance, double beforeMove) {
+/*
 		if (longestRoute < 0) {
 			longestRoute = route;
 		} else {
@@ -195,6 +196,8 @@ public class WCPSolution implements Solution {
 				}
 			}
 		}
+		*/
+findLongestRoute();
 	}
 
 	public int getNumRoutes() {
@@ -702,6 +705,7 @@ public class WCPSolution implements Solution {
 
 	public void addNode(int v, int r) {
 		if (r > routes.length - 1) {
+			System.out.println("Hola!");
 			this.numRoutes = r + 1;
 			routes = Arrays.copyOf(this.routes, r + 1);
 			routes[r] = new WCPRoute(instance);
