@@ -1,7 +1,6 @@
 package grafo.cvrpbi.evolutive;
 
 import grafo.cvrpbi.constructive.C1;
-import grafo.cvrpbi.structure.CVRPInstance;
 import grafo.cvrpbi.structure.WCPInstance;
 import grafo.cvrpbi.structure.WCPRoute;
 import grafo.cvrpbi.structure.WCPSolution;
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 
 public class CVRPProblem<T extends Constructive<WCPInstance, WCPSolution>> extends AbstractIntegerPermutationProblem {
 
-//  Permutation with attributes for the routes !!!
+    public WCPSolution testSol;
 
     protected final JavaRandomGenerator random = new JavaRandomGenerator();
     protected final String ROUTES = "Routes";
@@ -44,6 +43,7 @@ public class CVRPProblem<T extends Constructive<WCPInstance, WCPSolution>> exten
 
         // Create a solution with the constructive algorithm and translate it to a jMetal solution.
         WCPSolution sol = constructive.constructSolution(instance);
+        testSol = sol;
 
         PermutationSolution<Integer> jmSol = convert(sol);
 
@@ -57,10 +57,17 @@ public class CVRPProblem<T extends Constructive<WCPInstance, WCPSolution>> exten
 
     @Override
     public void evaluate(PermutationSolution<Integer> integerPermutationSolution) {
+        // Convert to WCPSolution and evaluate there:
+        WCPSolution sol = convert(integerPermutationSolution);
 
+        // Set objective values:
+        integerPermutationSolution.setObjective(0,sol.getTotalDist());
+        integerPermutationSolution.setObjective(1,sol.getDistanceLongestRoute());
+        integerPermutationSolution.setObjective(2,sol.getDifTime());
+        integerPermutationSolution.setObjective(3,sol.getNumRoutes());
     }
 
-    
+
     /**
      * Converts from WCPSolution to jMetal Solution.
      * @param sol
@@ -82,12 +89,12 @@ public class CVRPProblem<T extends Constructive<WCPInstance, WCPSolution>> exten
             WCPRoute route = sol.getRoute(i);
             // Each route begins and ends with the depot (0). We avoid it with the subroute.
             for (int c : route.getSubRoute(1,route.size()-2)) {
-                // Incorporate customers to the permutation:
+                // Incorporate customers to the permutation (except N-1, which is 0)
                 jmSol.setVariableValue(idxPermutation,c == (instance.getNodes()-1) ? 0 : c);
                 idxPermutation++;
             }
-            // Add vehicle to solution:
-            routes.add(route.size());
+            // Add vehicle to solution (remove extreme values corresponding to depot).
+            routes.add(route.size()-2);
         }
 
         // Add routes to solution
@@ -99,11 +106,30 @@ public class CVRPProblem<T extends Constructive<WCPInstance, WCPSolution>> exten
 
     /**
      * Converts from jMetal Solution to WCPSolution
-     * @param sol
+     * @param jmSol
      */
-    public WCPSolution convert(PermutationSolution<Integer> sol) {
-        // TODO: to be implemented.
-        return null;
+    public WCPSolution convert(PermutationSolution<Integer> jmSol) {
+        WCPSolution sol = new WCPSolution(instance);
+
+        // Recover routes:
+        ArrayList<Integer> routes = (ArrayList<Integer>)jmSol.getAttribute(ROUTES);
+
+        int idxPermutation = 0;
+        int idxRoute = 0;
+
+        // Iterates along the routes.
+        for (Integer r : routes) {
+            int routeSize = r;
+            while (routeSize > 0) {
+                int v = jmSol.getVariableValue(idxPermutation);
+                sol.addNode(v == 0 ? instance.getNodes()-1 : v,idxRoute);
+                routeSize--;
+                idxPermutation++;
+            }
+            idxRoute++;
+        }
+
+        return sol;
     }
 
 
@@ -114,7 +140,12 @@ public class CVRPProblem<T extends Constructive<WCPInstance, WCPSolution>> exten
 
         CVRPProblem problem = new CVRPProblem(inst, new C1(0.5));
 
-        problem.createSolution();
+        PermutationSolution jmSol = problem.createSolution();
+        WCPSolution testSol2 = problem.convert(jmSol);
+
+        System.out.println(problem.testSol);
+
+        System.out.println(testSol2);
     }
 
 }
