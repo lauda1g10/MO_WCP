@@ -53,10 +53,13 @@ public class TestAlgorithm {
 		IteratedGreedy_Multi_WCK a4 = new IteratedGreedy_Multi_WCK(c1, c2, c3, cW, lambdaIntervals, construcciones,
 				igRR);
 		
-		a1.execute(instance);
-		a2.execute(instance);
-		a3.execute(instance);
-		a4.execute(instance);
+		for(int iter = 0; iter <construcciones;iter++){		
+		c3.constructSolution(instance);
+		}
+		//a1.execute(instance);
+		//a2.execute(instance);
+		//a3.execute(instance);
+		//a4.execute(instance);
 /*
 		String paretoDir = path + "./pareto";
 		String[] files = new File(paretoDir).list();

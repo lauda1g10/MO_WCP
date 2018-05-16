@@ -59,8 +59,7 @@ public class C1_TIME implements Constructive<WCPInstance, WCPSolution> {
 		// Seed nodes
 		for (int i = 0; i < nRoutes; i++) {
 			int v = cl.remove(rnd.nextInt(cl.size()));
-			double time = sol.evalTimeAddNode(v, i, 1);
-			sol.addNode(v, i,time);
+			sol.addNode(v, i);
 		}
 		
 		// Complete routes
@@ -128,7 +127,16 @@ public class C1_TIME implements Constructive<WCPInstance, WCPSolution> {
 				updateInsertCost(sol, cl, insertCosts, minRoute);
 			}
 		}
-		return (WCPSolution) sol;
+		/*System.out.println("f1 = "+sol.getTotalDist()+" ; F2 = "+sol.getDistanceLongestRoute()+" ; F3 = "+sol.getDifTime()+" ; F4 = "+sol.getNumRoutes());
+		System.out.println("longest Route = "+sol.getLongestRoute());
+		System.out.println("max Route = "+sol.getMaxRoute());
+		System.out.println("min Route = "+sol.getMinRoute());
+		System.out.println("Routes info");
+		for(int r=0;r<sol.getNumRoutes();r++){
+			System.out.println("dist "+r+" :"+ sol.getRoute(r).getDistance());
+			System.out.println("time "+r+" :"+ sol.getRoute(r).getTime());
+		}*/
+		return sol;
 	}
 
 	private InsertCost[] createInsertCost(WCPSolution sol, List<Integer> cl, int n, int nRoutes) {

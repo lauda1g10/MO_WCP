@@ -15,6 +15,7 @@ public class Route {
 		route = new ArrayList<>();
 		route.add(0);
 		route.add(0);
+		distance = 0;
 		this.instance = instance;
 	}
 

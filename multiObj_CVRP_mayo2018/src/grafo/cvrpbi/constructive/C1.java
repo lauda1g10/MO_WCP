@@ -118,6 +118,15 @@ public class C1 implements Constructive<WCPInstance, WCPSolution> {
 		}
 		sol.findLongestRoute();
 		sol.findTimes();
+		/*System.out.println("f1 = "+sol.getTotalDist()+" ; F2 = "+sol.getDistanceLongestRoute()+" ; F3 = "+sol.getDifTime()+" ; F4 = "+sol.getNumRoutes());
+		System.out.println("longest Route = "+sol.getLongestRoute());
+		System.out.println("max Route = "+sol.getMaxRoute());
+		System.out.println("min Route = "+sol.getMinRoute());
+		System.out.println("Routes info");
+		for(int r=0;r<sol.getNumRoutes();r++){
+			System.out.println("dist "+r+" :"+ sol.getRoute(r).getDistance());
+			System.out.println("time "+r+" :"+ sol.getRoute(r).getTime());
+		}*/
 		return sol;
 	}
 

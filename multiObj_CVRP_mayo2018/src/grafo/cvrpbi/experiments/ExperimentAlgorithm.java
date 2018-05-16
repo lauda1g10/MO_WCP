@@ -43,7 +43,7 @@ public class ExperimentAlgorithm {
         String date = String.format("%04d-%02d-%02d", year, month, day);
 
         WCPInstanceFactory factory = new WCPInstanceFactory();
-        int construcciones = 500;
+        int construcciones = 100;
         String instanceSet = (args.length == 0) ? "preliminar" : args[0];
         String dir ="./instancias/"+instanceSet;
         		        

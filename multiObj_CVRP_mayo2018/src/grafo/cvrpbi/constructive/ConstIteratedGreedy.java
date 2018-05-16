@@ -48,7 +48,7 @@ public WCPSolution constructSolution(WCPInstance instance) {
 		this.removedNodes.clear();
 		WCPSolution incompleteSolution = destroy(s);
 		WCPSolution newSol = reBuild(incompleteSolution);
-		if (newSol.getOF()<(1+beta)*bestSol.getOF()){
+		if (newSol.getOF()<(1+beta)*s.getOF()){
 			iterSinMejora = 0;
 			s.copy(newSol);
 			if(newSol.getOF()<bestSol.getOF()){

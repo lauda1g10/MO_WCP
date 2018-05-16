@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import grafo.optilib.structure.Solution;
@@ -70,7 +69,12 @@ public class WCPSolution implements Solution {
 	public int getLongestRoute() {
 		return longestRoute;
 	}
-
+public int getMaxRoute(){
+	return this.maxTimeR;
+}
+public int getMinRoute(){
+	return this.minTimeR;
+}
 	public double getDistanceLongestRoute() {
 		return routes[longestRoute].getDistance();
 	}
@@ -80,9 +84,9 @@ public class WCPSolution implements Solution {
 	}
 
 	public void removeRoute(int rt) {
-		WCPRoute[] newRoutes = Arrays.copyOf(this.routes, numRoutes - 1);
+		WCPRoute[] newRoutes = new WCPRoute[numRoutes-1];
 		for (int r = rt + 1; r < numRoutes; r++) {
-			newRoutes[r - 1] = this.routes[r];
+			newRoutes[r - 1] = new WCPRoute(this.routes[r]);
 		}
 		this.numRoutes = this.numRoutes - 1;
 		this.routes = newRoutes;
@@ -106,8 +110,13 @@ public class WCPSolution implements Solution {
 	}
 
 	public void setNumRoutes(int r) {
-		this.routes = Arrays.copyOf(routes, r);
+		WCPRoute[] newRoutes = new WCPRoute[r];
+		for (int rt = 0; rt < r; rt++) {
+			newRoutes[rt] = new WCPRoute(this.routes[rt]);
+		}
 		this.numRoutes = r;
+		this.routes = newRoutes;
+		findTimes();
 	}
 
 	public boolean dominates(WCPSolution sol) {
@@ -182,7 +191,6 @@ public class WCPSolution implements Solution {
 	}
 
 	public void updateLongestRoute(int route, double newDistance, double beforeMove) {
-/*
 		if (longestRoute < 0) {
 			longestRoute = route;
 		} else {
@@ -196,8 +204,6 @@ public class WCPSolution implements Solution {
 				}
 			}
 		}
-		*/
-findLongestRoute();
 	}
 
 	public int getNumRoutes() {
@@ -205,11 +211,11 @@ findLongestRoute();
 	}
 
 	public void findLongestRoute() {
-		double min = Double.MAX_VALUE;
+		double max = Double.MIN_VALUE;
 		for (int r = 0; r < numRoutes; r++) {
-			if (routes[r].getDistance() < min) {
+			if (routes[r].getDistance() > max) {
 				this.longestRoute = r;
-				min = routes[r].getDistance();
+				max = routes[r].getDistance();
 			}
 		}
 	}
@@ -339,27 +345,11 @@ findLongestRoute();
 
 	public int longestRouteIf(int route, double newDistance, double before) {
 		if (longestRoute != route) {
-			if (newDistance < routes[longestRoute].getDistance()) {
-				return longestRoute;
-			} else {// en este caso ya sabemos que la ruta modificada es más
-					// larga que la más larga.
-				double max = newDistance;
-				int rt = route;
-				for (int r = 0; r < instance.getVehicles(); r++) {
-					if (r != route && r != longestRoute) {
-						if (routes[r].getDistance() > max) {
-							rt = r;
-							max = routes[r].getDistance();
-						}
-					}
-				}
-				return rt;
+			if (newDistance > routes[longestRoute].getDistance()) {
+				return route;
 			}
 		} else if (longestRoute == route) {
-			if (newDistance > routes[longestRoute].getDistance()) {
-				return longestRoute;
-			} else {// en este caso ya sabemos que la ruta modificada es más
-					// corta que la más larga.
+			if (newDistance < routes[longestRoute].getDistance()) {
 				double max = newDistance;
 				int rt = route;
 				for (int r = 0; r < instance.getVehicles(); r++) {
@@ -705,16 +695,21 @@ findLongestRoute();
 
 	public void addNode(int v, int r) {
 		if (r > routes.length - 1) {
-			System.out.println("Hola!");
-			this.numRoutes = r + 1;
-			routes = Arrays.copyOf(this.routes, r + 1);
-			routes[r] = new WCPRoute(instance);
+			numRoutes = r+1;
+			WCPRoute[] newRoutes = new WCPRoute[numRoutes];
+			for (int rt = 0; rt < numRoutes-1; rt++) {
+				newRoutes[rt] = new WCPRoute(this.routes[rt]);
+			}
+			newRoutes[numRoutes-1] = new WCPRoute(instance);
+			this.routes = newRoutes;
+			findTimes();
 		}
 		WCPRoute route = routes[r];
 		double before = route.getDistance();
+		double newTime = route.getTime() + route.evalTimeAddNode(v, route.size() - 1);
 		totalDist -= route.getDistance();
-		updateTimingRoutes(r, route.getTime() + route.evalTimeAddNode(v, route.size() - 1));
 		route.addNode(v);
+		updateTimingRoutes(r,newTime);
 		totalDist += route.getDistance();
 		updateLongestRoute(r, route.getDistance(), before);
 	}
@@ -729,6 +724,11 @@ findLongestRoute();
 		totalDist += incDistance;
 		updateLongestRoute(r, before + incDistance, before);
 		updateTimingRoutes(r, routes[r].getTime() + incTime);
+		/*double beforeTime = routes[r].getTime();
+		routes[r].evaluateNaiveTime();
+		if ( Math.abs(routes[r].getTime()-beforeTime)>WCPInstance.EPSILON){
+			System.out.println("CACA");
+		}*/
 	}
 
 	public void incrementVehicle() {

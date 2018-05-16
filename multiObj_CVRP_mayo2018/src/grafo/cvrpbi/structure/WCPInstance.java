@@ -153,7 +153,7 @@ public class WCPInstance implements Instance {
                     speed = 30;
                     traffic = 0.6;
                 }
-                time[i][j] = distances[i][j]*speed * ((double)1000 / 3600) * traffic;
+                time[i][j] = (((double)distances[i][j])/speed * ((double)1000 / 3600)) * traffic;
              //   System.out.println("tiempo ="+ time[i][j]+", distancia = "+distances[i][j]);
             }
         }

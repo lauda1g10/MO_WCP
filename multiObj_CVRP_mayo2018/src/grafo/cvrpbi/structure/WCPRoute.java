@@ -13,6 +13,7 @@ public class WCPRoute extends Route {
 	
 	public WCPRoute(WCPInstance instance) {
 		super(instance);
+		time = 0;
 	}
 	@Override
 	 public double evalAddNode(int v, int p) {
@@ -88,9 +89,12 @@ public class WCPRoute extends Route {
 	public double timeBetween(int start, int end) {
 		double dist = 0;
 		for (int i = start; i < end; i++) {
-			dist += instance.getTime(route.get(i), route.get(i + 1));
+			dist += instance.getTime(route.get(i), route.get(i + 1))+WCPInstance.loadingTime;
 		}
-		return dist + (end - start + 1) * WCPInstance.loadingTime;
+		if (start == 0){
+			return dist-WCPInstance.loadingTime;
+		}
+		return dist;
 	}
 
 	public double reverseTimeBetween(int start, int end) {
@@ -124,8 +128,6 @@ public class WCPRoute extends Route {
 	this.time += instance.getTime(route.get(route.size() - 2), v)+instance.getTime(v,route.get(route.size() - 1));
 	this.time+= WCPInstance.loadingTime;
 	super.addNode(v);
-
-		
 	}
 
 	public double evalTimeAddNode(int v, int p) {
@@ -143,6 +145,9 @@ public void setTime(double t){
 	public void evaluateNaive() {
 		this.distance = this.distanceBetween(0, this.size() - 1);
 		this.demand = 0;
+	}
+	public void evaluateNaiveTime() {
+		this.time = this.timeBetween(0, this.size() - 1);
 	}
 
 	public String saveRNEVAformat() {
