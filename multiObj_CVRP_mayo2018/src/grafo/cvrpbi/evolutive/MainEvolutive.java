@@ -11,6 +11,7 @@ import org.uma.jmetal.operator.impl.crossover.PMXCrossover;
 import org.uma.jmetal.operator.impl.mutation.PermutationSwapMutation;
 import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
 import org.uma.jmetal.solution.PermutationSolution;
+import org.uma.jmetal.util.SolutionListUtils;
 import org.uma.jmetal.util.comparator.DominanceComparator;
 import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
 import org.uma.jmetal.util.evaluator.impl.SequentialSolutionListEvaluator;
@@ -89,7 +90,7 @@ public class MainEvolutive {
 
 
         for (String inst : instances) {
-
+/*
             if (outDir != null) {
                 try {
                     Files.write(Paths.get(outDir + File.separator + inst + ".txt"),
@@ -98,7 +99,7 @@ public class MainEvolutive {
                     System.err.println("Solutions file error: " + ex.getLocalizedMessage());
                 }
             }
-
+*/
             long start = System.currentTimeMillis();
 
             // Read instance
@@ -108,7 +109,7 @@ public class MainEvolutive {
             // Create the problem
             CVRPProblem problem = new CVRPProblem(instance,constructive);
 
-            // Solutions
+            // Solutions from all executions
             ArrayList<PermutationSolution<Integer>> bestSolutions = new ArrayList<>();
 
             double[] results = new double[runs];
@@ -135,9 +136,13 @@ public class MainEvolutive {
 
             System.out.println("\nExec time (secs) for instance "+instance.getName()+" : "+end+"\n");
 
+            // Obtain non-dominated solutions from all executions:
+            List<PermutationSolution<Integer>> ndSols = SolutionListUtils.getNondominatedSolutions(bestSolutions);
+
             if (outDir != null) {
 //                writeStatsToFile(bestSolutions, instance.getName(), outDir);
-                writeStatsToFile(results, instance.getName(), outDir);
+//                writeStatsToFile(results, instance.getName(), outDir);
+                writeFrontToFile(ndSols, inst, outDir);
             }
 
         }

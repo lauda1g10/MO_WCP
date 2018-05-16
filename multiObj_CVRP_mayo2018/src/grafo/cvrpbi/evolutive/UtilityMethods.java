@@ -49,6 +49,25 @@ public class UtilityMethods {
     }
 
 
+    public static void writeFrontToFile(List<PermutationSolution<Integer>> ndSols, String name, String directory) {
+        StringBuilder str = new StringBuilder();
+
+        for (PermutationSolution<Integer> s : ndSols) {
+            str.append(s.getObjective(0)).append("\t")
+                    .append(s.getObjective(1)).append("\t")
+                    .append(s.getObjective(2)).append("\t")
+                    .append(s.getObjective(3)).append("\n");
+        }
+
+        try {
+            Files.write(Paths.get(directory + File.separator + name + "_result.txt"),
+                    str.toString().getBytes());
+        } catch (Exception ex) {
+            System.err.println("Front file error: " + ex.getLocalizedMessage());
+        }
+    }
+
+
     public static List<String> obtainFiles(String dir) {
         File f = new File(dir);
 
@@ -59,11 +78,7 @@ public class UtilityMethods {
             }
         }
 
-        // Return only ONE file (for development)
-        return parsedList.subList(0,1);
-
-// TODO: return all the files of the directory !!
-//        return parsedList;
+        return parsedList;
 
 
     }
