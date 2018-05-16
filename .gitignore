@@ -1,4 +1,4 @@
 .idea/
 *.iml
-*.class
 .DS_Store
+multiObj_CVRP_mayo2018/bin/
