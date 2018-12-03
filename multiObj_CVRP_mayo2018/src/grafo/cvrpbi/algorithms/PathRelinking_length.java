@@ -23,11 +23,10 @@ public class PathRelinking_length extends AlgPathRelinking {
 
 		int runs = 0;
 		while (runs < super.maxTries) {
-			int rG = RandomManager.getRandom().nextInt(WCPInstance .currentVehicles);
+			int rG = RandomManager.getRandom().nextInt(super.getGuideSolutionVeh());
 			boolean finish = false;
 			int fails = 0;
 			while (!finish) {
-
 				finish = true;
 				int rI = super.findRouteCommonWith(rG);
 				int eqPos = 0;
@@ -111,7 +110,7 @@ public class PathRelinking_length extends AlgPathRelinking {
 								v = nodesBYdemand.get(n).getId();
 								if (rT == rI) {
 									for (int i = 0; i < super.maxTries; i++) {
-										rT = RandomManager.getRandom().nextInt(WCPInstance .currentVehicles);
+										rT = RandomManager.getRandom().nextInt(initial.getNumRoutes());
 										for (int p = 1; p < initial.getRoute(rT).size() - 1; p++) {
 											int vT = initial.getRoute(rT).getNodeAt(p); // ¿cómo
 																						// lo
@@ -321,7 +320,7 @@ public class PathRelinking_length extends AlgPathRelinking {
 		// sea FACTIBLE.
 		if (rTO == r) {
 			for (int i = 0; i < super.maxTries; i++) {
-				rTO = RandomManager.getRandom().nextInt(WCPInstance .currentVehicles);
+				rTO = RandomManager.getRandom().nextInt(initial.getNumRoutes());
 				if (rTO != r && initial.isFeasibleAdd(v, rTO)) {
 					return tryInsert(v, rTO);
 				}

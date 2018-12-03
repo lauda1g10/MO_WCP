@@ -98,6 +98,5 @@ public class CoverageMetric {
 
     public static void main(String[] args) {
     	createExcel("./pareto/"+CVRPInstance.name, "./instancesResults.csv");
-        //createExcel("/Users/jesussanchezoro/Downloads/paretos", "./salida.csv");
     }
 }

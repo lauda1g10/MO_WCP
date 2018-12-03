@@ -2,11 +2,11 @@ package grafo.cvrpbi.algorithms;
 
 import grafo.cvrpbi.structure.Pareto;
 import grafo.cvrpbi.structure.WCPInstance;
-import grafo.cvrpbi.structure.WCPInstance;
 import grafo.cvrpbi.structure.WCPSolution;
 import grafo.optilib.metaheuristics.Algorithm;
 import grafo.optilib.results.Result;
 import grafo.optilib.structure.Solution;
+import grafo.optilib.tools.RandomManager;
 import grafo.optilib.tools.Timer;
 
 /**
@@ -26,19 +26,27 @@ public abstract class AlgPathRelinking implements Algorithm<WCPInstance> {
 	protected int[] nodePosG;
 	protected int[] nodeRouteI;
 	protected int[] nodePosI;
+	
 
 	public AlgPathRelinking(Algorithm<WCPInstance> a) {
 		this.alg = a;
 	}
-
+public int getGuideSolutionVeh(){
+	return guide.getNumRoutes();
+}
+public int getInitialSolutionVeh(){
+	return initial.getNumRoutes();
+}
 	@Override
 	public Result execute(WCPInstance instance) {
 		this.instance = instance;
 		Result r = new Result(instance.getName());
 		Timer.initTimer();
 		Pareto.reset();
-		for(int k = WCPInstance.currentVehicles;k<instance.getMaxVeh();k++) {
 		alg.execute(instance);
+		String path0 = "./pareto/" + instance.getName() +"/sol"+WCPInstance.indexSolution+this.alg+ ".txt";
+		System.out.print(instance.getName()+"\t"+Pareto.size()+"\t");
+		Pareto.saveToFile(path0);
 		nodeRouteG = new int[instance.getNodes()];
 		nodePosG = new int[instance.getNodes()];
 		nodeRouteI = new int[instance.getNodes()];
@@ -48,11 +56,11 @@ public abstract class AlgPathRelinking implements Algorithm<WCPInstance> {
 		WCPSolution s2 = new WCPSolution(instance);
 		// primero hacemos en base al primer objetivo: TOTAL DISTANCE
 		int p = 0;
+		int iter = 0;		
 		int sizeP = Pareto.size();
-		while (p<Pareto.size()-1){
+		while (sizeP>1 && iter<maxTries){
 			s1.copy(Pareto.getFrontAt(p));
-			s2.copy(Pareto.getFrontAt(p + 1));
-			this.symDistance = new int[s1.getNumRoutes()][s2.getNumRoutes()]; //Esta definición varía en el caso MOWCP 
+			s2.copy(Pareto.getFrontAt(p + 1)); 
 			
 			WCPSolution.currentOF = WCPSolution.ObjFunct.TOTAL_DIST;
 			if (s1.getOF() < s2.getOF()) {
@@ -64,6 +72,7 @@ public abstract class AlgPathRelinking implements Algorithm<WCPInstance> {
 				guide = s1;
 				initial.copy(s2);
 			}
+			
 			
 			this.createNodeInRouteG();
 			this.createNodeInRouteI();
@@ -105,13 +114,17 @@ public abstract class AlgPathRelinking implements Algorithm<WCPInstance> {
 			
 			if(Pareto.size()!=sizeP){
 				sizeP = Pareto.size();
-				p=0;
+				iter = 0;
+				p=RandomManager.getRandom().nextInt(sizeP-1);
 			}
-			p++;
+			else{
+				iter++;
+				if(Pareto.size()-1>p+1)
+				p++;
+				}
+			
 		}
-		WCPInstance.currentVehicles = WCPInstance.currentVehicles+1;
-		}
-		String path = "./pareto/" + instance.getName() +"/"+this.getClass().getSimpleName()+alg.getClass().getSimpleName()+ ".txt";
+		String path = "./pareto/" + instance.getName() +"/PR"+WCPInstance.indexSolution+alg.getClass().getSimpleName()+ ".txt";
 		Pareto.saveToFile(path);
 		double secs = Timer.getTime() / 1000.0;
 		System.out.println(Pareto.size() + "\t" + secs);
@@ -136,13 +149,14 @@ public abstract class AlgPathRelinking implements Algorithm<WCPInstance> {
 	}
 
 	protected void obtainSymDistanceM() {
-		for (int rI = 0; rI < initial.getInstance().getVehicles(); rI++) {
+		this.symDistance = new int[guide.getNumRoutes()][initial.getNumRoutes()]; //Esta definición varía en el caso MOWCP
+		for (int rI = 0; rI < initial.getNumRoutes(); rI++) {
 			updateSymDistanceM(rI);
 		}
 	}
 
 	protected void updateSymDistanceM(int rI) {
-		for (int rG = 0; rG < initial.getNumRoutes(); rG++) {
+		for (int rG = 0; rG < guide.getNumRoutes(); rG++) {
 			symDistance[rG][rI] = countCommon(rG, rI);
 		}
 	}

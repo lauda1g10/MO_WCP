@@ -7,12 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 import grafo.cvrpbi.constructive.C1_WCK;
-import grafo.cvrpbi.improvements.LSInterK;
-import grafo.cvrpbi.improvements.LSIntra2Opt;
-import grafo.cvrpbi.improvements.VNS;
 import grafo.cvrpbi.structure.Pareto;
 import grafo.cvrpbi.structure.WCPInstance;
-import grafo.cvrpbi.structure.WCPInstance_RealInstance;
 import grafo.cvrpbi.structure.WCPSolution;
 import grafo.optilib.metaheuristics.Algorithm;
 import grafo.optilib.metaheuristics.Constructive;
@@ -24,20 +20,20 @@ import grafo.optilib.tools.Timer;
 /**
  * Created by LauraDelgado on 27/10/2017.
  */
-public class AlgConstWCK_Multi_LS implements Algorithm<WCPInstance_RealInstance> {
+public class AlgConstWCK_Multi_LS implements Algorithm<WCPInstance> {
 
 	private C1_WCK c;
-	private Constructive<WCPInstance_RealInstance, WCPSolution> c1;
-	private Constructive<WCPInstance_RealInstance, WCPSolution> c2;
-	private Constructive<WCPInstance_RealInstance, WCPSolution> c3;
+	private Constructive<WCPInstance, WCPSolution> c1;
+	private Constructive<WCPInstance, WCPSolution> c2;
+	private Constructive<WCPInstance, WCPSolution> c3;
 	private Improvement<WCPSolution> ls;
 	private int iters;
 	private WCPSolution best;
 	private final double ratio = 1.15;
 	private int lambdaInterval;
 
-	public AlgConstWCK_Multi_LS(C1_WCK c, Constructive<WCPInstance_RealInstance, WCPSolution> c1,
-			Constructive<WCPInstance_RealInstance, WCPSolution> c2, Constructive<WCPInstance_RealInstance, WCPSolution> c3,
+	public AlgConstWCK_Multi_LS(C1_WCK c, Constructive<WCPInstance, WCPSolution> c1,
+			Constructive<WCPInstance, WCPSolution> c2, Constructive<WCPInstance, WCPSolution> c3,
 			Improvement<WCPSolution> ls, int iters, int lambdaInterval) {
 		this.c = c;
 		this.c1 = c1;
@@ -49,18 +45,17 @@ public class AlgConstWCK_Multi_LS implements Algorithm<WCPInstance_RealInstance>
 	}
 
 	@Override
-	public Result execute(WCPInstance_RealInstance instance) {
+	public Result execute(WCPInstance instance) {
 		best = null;
 		Result r = new Result(instance.getName());
-		Pareto.reset();
-		System.out.print(instance.getName() + "\t");
-		Timer.initTimer();
-		// Initial values for ideal1&2&3
-		VNS vns = new VNS(
-				new Improvement[] { new LSInterK(0.01), new LSIntra2Opt(), new LSInterK(0.01)}, 0.05);
+		//Pareto.reset();
+		
+		//Timer.initTimer();
 		
 		double[] min = new double[4];
 		double[] max = new double[4];
+		min[3] = instance.numVeh();
+		max[3] = instance.getMaxVeh();
 		for (int k = instance.numVeh(); k < instance.getMaxVeh(); k++) {
 		// Initial values for ideal1&2&3
 			WCPSolution[] sols = new WCPSolution[4];
@@ -86,13 +81,13 @@ public class AlgConstWCK_Multi_LS implements Algorithm<WCPInstance_RealInstance>
 			}
 		}
 		for (WCPSolution s : bests) {
-			vns.improve(s);
+			ls.improve(s);
 			if (s.getOF() < sols[0].getOF()) {
 				sols[0] = s;
 			}
 		}
 		if (sols[0] != null) {
-			System.out.println("Solución 1 = " + sols[0]);
+			////System.out.println("Solución 1 = " + sols[0]);
 			bests.clear();
 			WCPSolution.currentOF = WCPSolution.ObjFunct.LONGEST_ROUTE;
 			sols[1] = null;
@@ -115,12 +110,12 @@ public class AlgConstWCK_Multi_LS implements Algorithm<WCPInstance_RealInstance>
 				}
 			}
 			for (WCPSolution s : bests) {
-				vns.improve(s);
+				ls.improve(s);
 				if (s.getOF() < sols[1].getOF()) {
 					sols[1] = s;
 				}
 			}
-			System.out.println("Solución 2 = " + sols[1]);
+			//System.out.println("Solución 2 = " + sols[1]);
 			if (sols[1] != null) {
 				bests.clear();
 				WCPSolution.currentOF = WCPSolution.ObjFunct.TIME;
@@ -144,12 +139,12 @@ public class AlgConstWCK_Multi_LS implements Algorithm<WCPInstance_RealInstance>
 					}
 				}
 				for (WCPSolution s : bests) {
-					vns.improve(s);
+					ls.improve(s);
 					if (s.getOF() < sols[2].getOF()) {
 						sols[2] = s;
 					}
 				}
-				System.out.println("Solución 3 = " + sols[2]);
+				//System.out.println("Solución 3 = " + sols[2]);
 				if (sols[2] != null) {
 					bests.clear();
 				}
@@ -184,12 +179,10 @@ public class AlgConstWCK_Multi_LS implements Algorithm<WCPInstance_RealInstance>
 					sols[2].getDistanceLongestRoute());
 			min[2] = Math.min(Math.min(sols[0].getDifTime(), sols[1].getDifTime()), sols[2].getDifTime());
 			max[2] = Math.max(Math.max(sols[0].getDifTime(), sols[1].getDifTime()), sols[2].getDifTime());
-			min[3] = instance.numVeh();
-			max[3] = instance.getMaxVeh();
 			C1_WCK.setIdeal(min);
-			// System.out.print(min);
+			// //System.out.print(min);
 			C1_WCK.setNadir(max);
-			// System.out.print(max);
+			// //System.out.print(max);
 			// ahora podemos aplicar las BL
 
 			for (int i = 0; i < lambdaInterval; i++) {
@@ -197,25 +190,22 @@ public class AlgConstWCK_Multi_LS implements Algorithm<WCPInstance_RealInstance>
 				constructN(instance, iters);
 			}
 		}
-		WCPInstance.currentVehicles = WCPInstance.currentVehicles+1;
+		instance.incrementRoute();
 		}
 		double secs = Timer.getTime() / 1000.0;
-		System.out.println("Soluciones de Pareto = " + Pareto.size());
-		System.out.println(C1_WCK.evalWierzbicki(best.getTotalDist(), best.getDistanceLongestRoute(), best.getDifTime(),best.getNumRoutes())
-				+ "\t" + secs);
-		r.add("TotalDist",
-				C1_WCK.evalWierzbicki(best.getTotalDist(), best.getDistanceLongestRoute(), best.getDifTime(),best.getNumRoutes()));
+		//System.out.print(Pareto.size() + "\t" + secs + "\n");
+		r.add("Pareto", Pareto.size());
 		r.add("Time (s)", secs);
-		File folder = new File("./pareto/"+ instance.getName());
+		File folder = new File("./pareto/" + instance.getName());
 		if (!folder.exists()) {
 			folder.mkdirs();
-			}
+		}
 		String path = "./pareto/" + instance.getName() +"/"+this.getClass().getSimpleName()+".txt";
 		Pareto.saveToFile(path);
 		return r;
 	}
 
-	private WCPSolution constructN(WCPInstance_RealInstance instance, int n) {
+	private WCPSolution constructN(WCPInstance instance, int n) {
 		best = null;
 		List<WCPSolution> bestSols = new ArrayList<WCPSolution>();
 		for (int i = 0; i < iters; i++) {

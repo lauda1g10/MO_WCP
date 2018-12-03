@@ -10,12 +10,12 @@ import grafo.optilib.tools.RandomManager;
 /**
  * Created by Laura on 11/04/2018.
  */
-public class VND_combi implements Improvement<WCPSolution> {
+public class VND_combi extends VND {
 
 	private Improvement<WCPSolution>[] ls;
 
 	public VND_combi(Improvement<WCPSolution>[] ls) {
-		this.ls = ls;
+		super(ls);
 	}
 
 	@Override
@@ -40,16 +40,5 @@ public class VND_combi implements Improvement<WCPSolution> {
 					k++;
 				}
 		}
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder stb = new StringBuilder();
-		stb.append(this.getClass().getSimpleName()).append("(");
-		for (Improvement<WCPSolution> search : ls) {
-			stb.append(search).append(",");
-		}
-		stb.append(")");
-		return stb.toString();
 	}
 }

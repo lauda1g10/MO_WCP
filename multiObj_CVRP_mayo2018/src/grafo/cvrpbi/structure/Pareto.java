@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import grafo.cvrpbi.constructive.C1_WCK;
+
 public abstract class Pareto {
 
 	private static List<WCPSolution> front;
@@ -22,10 +24,26 @@ public abstract class Pareto {
 
 	public static void reset() {
 		front = new ArrayList<>(1000);
-		approxToFront = new HashSet<>(2000);
+		resetApproxSet();
 		ratio = 0.05;
 	}
-
+	public static List<double[]> readParetoSetFrom(String path) throws IOException {
+		List<double[]> salida = new ArrayList<>();
+		BufferedReader bfInstance = new BufferedReader(new FileReader(path));
+		// Archivo
+		String line = bfInstance.readLine().trim();
+		while (!line.isEmpty()) {
+			String[] values = line.split(" ");
+			double[] Fvalue = new double[values.length];
+			for (int i = 0; i < values.length; i++) {
+				Fvalue[i] = Double.parseDouble(values[i]);
+			}
+			salida.add(Fvalue);
+			line = bfInstance.readLine().trim();
+		}
+		bfInstance.close();
+		return salida;
+	}
 	public static void setRatio(double d) {
 		ratio = d;
 	}
@@ -86,11 +104,13 @@ public abstract class Pareto {
 		// si entra en
 		// el conjunto
 		// de pareto.
-		boolean enter = true;
+		boolean enter = front.isEmpty();
+		if (!enter) {
 		for (WCPSolution frontSol : front) {
 			if (frontSol.dominates(f1, f2, f3,f4)) {
 				return false;
 			}
+		}
 		}
 		return enter;
 	}
@@ -121,14 +141,28 @@ public abstract class Pareto {
 			removed++;
 		}
 		if (enter) {
-			// front.add(newSol);
+			if(newSol.getTotalDist()<C1_WCK.getIdeal1()) {
+				C1_WCK.setIdeal1(newSol.getTotalDist());
+			}else if (newSol.getTotalDist()>C1_WCK.getNadir1()) {
+				C1_WCK.setNadir1(newSol.getTotalDist());
+			}
+			if(newSol.getDistanceLongestRoute()<C1_WCK.getIdeal2()) {
+				C1_WCK.setIdeal1(newSol.getDistanceLongestRoute());
+			}else if (newSol.getDistanceLongestRoute()>C1_WCK.getNadir2()) {
+				C1_WCK.setNadir2(newSol.getDistanceLongestRoute());
+			}
+			if(newSol.getDifTime()<C1_WCK.getIdeal3()) {
+				C1_WCK.setIdeal3(newSol.getDifTime());
+			}else if (newSol.getDifTime()>C1_WCK.getNadir3()) {
+				C1_WCK.setNadir3(newSol.getDifTime());
+			}
 			front.add(new WCPSolution(newSol));// ¿no hace falta una copia de
 												// esto?
 		//	front.sort((Comparator.comparingDouble(WCPSolution::getTotalDist)));// ordena
 																				// de
 																				// forma
 																				// creciente
-			// updateApproxSet();
+			 //updateApproxSet();
 		}
 
 		return enter;
@@ -194,7 +228,7 @@ public abstract class Pareto {
 		return enter;
 	}
 
-	private static boolean checkApprox(WCPSolution sol) {
+	public static boolean checkApprox(WCPSolution sol) {
 		return (sol != null)
 				&& (checkApprox(new double[] { sol.getTotalDist(), sol.getDistanceLongestRoute(), sol.getDifTime() }));
 	}
@@ -202,16 +236,17 @@ public abstract class Pareto {
 	public static boolean addApprox(WCPSolution sol) {
 		if (checkApprox(sol)) {
 			approxToFront.add(sol);
+			updateApproxSet();
 			return true;
 		} else
 			return false;
 	}
 
-	/*
-	 * private static void updateApproxSet() { List<WCPSolution> dominated = new
-	 * ArrayList<>(); for (WCPSolution sol : approxToFront) { if (!checkApprox(sol))
-	 * { dominated.add(sol); } } approxToFront.removeAll(dominated); }
-	 */
+	
+	  private static void updateApproxSet() { List<WCPSolution> dominated = new
+	  ArrayList<>(); for (WCPSolution sol : approxToFront) { if (!checkApprox(sol))
+	  { dominated.add(sol); } } approxToFront.removeAll(dominated); }
+	 
 	public static WCPSolution getFrontAt(int p) {
 
 		return front.get(p);
@@ -221,11 +256,12 @@ public abstract class Pareto {
 		StringBuilder stb = new StringBuilder();
 		for (WCPSolution sol : front) {
 			stb.append(sol.getTotalDist()).append(" ").append(sol.getDistanceLongestRoute()).append(" ")
-					.append(sol.getDifTime()).append("\n");
+			.append(sol.getDifTime()).append(" ").append(sol.getNumRoutes()).append("\n");
 		}
-		for (WCPSolution sol : front) {
+	/*	for (WCPSolution sol : front) {
 			stb.append(sol).append("\n");
 		}
+		*/
 		return stb.toString();
 	}
 

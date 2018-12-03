@@ -3,6 +3,7 @@ package grafo.cvrpbi.constructive;
 import java.util.ArrayList;
 import java.util.List;
 
+import grafo.cvrpbi.structure.Pareto;
 import grafo.cvrpbi.structure.WCPInstance;
 import grafo.cvrpbi.structure.WCPSolution;
 import grafo.cvrpbi.structure.WCPSolution.ObjFunct;
@@ -13,6 +14,7 @@ private double alpha; //porcentaje de destrucción (fijo)
 private double beta; // criterio de aceptación: admito la solución hasta ser un beta% peor que la anterior
 private int maxIter;
 protected WCPSolution bestSol;
+protected WCPSolution iniSol;
 protected List<Integer> removedNodes;
 protected CRandom cRand;
 protected Constructive<WCPInstance, WCPSolution> c;
@@ -41,24 +43,34 @@ public void setConstructive(Constructive<WCPInstance,WCPSolution> newC){
 public WCPSolution constructSolution(WCPInstance instance) {
      //inicializamos los valores para WCK:
      WCPSolution s = c.constructSolution(instance);
+     if (s==null){
+    	 return null;
+     }
+     iniSol = new WCPSolution(s);
      bestSol = new WCPSolution(s);
+    // System.out.println("Valor F.O: "+bestSol.getOF());
 	//mejora?
 	int iterSinMejora = 0;
 	while(iterSinMejora<maxIter){
 		this.removedNodes.clear();
 		WCPSolution incompleteSolution = destroy(s);
 		WCPSolution newSol = reBuild(incompleteSolution);
-		if (newSol.getOF()<(1+beta)*s.getOF()){
-			iterSinMejora = 0;
+		Pareto.addApprox(newSol);
+		if (Math.abs(s.getOF()-newSol.getOF())>WCPInstance.EPSILON && newSol.getOF()<(1+beta)*bestSol.getOF()){
 			s.copy(newSol);
-			if(newSol.getOF()<bestSol.getOF()){
+			if(newSol.getOF()-bestSol.getOF()<-WCPInstance.EPSILON){
 				bestSol.copy(newSol);
+			//	System.out.println("nuevo valor F.O:"+bestSol.getOF());
+				iterSinMejora = 0;
+			}else{
+				iterSinMejora++;
 			}
 		}
 		else{
 			iterSinMejora++;
 		}
 	} 
+	//System.out.println(bestSol);
      return bestSol;
 }
 
@@ -166,8 +178,8 @@ protected void updateInsertCost(WCPSolution sol, List<Integer> cl, InsertCost[] 
 		}
 	}
 }
-@Override
+/*@Override
 public String toString() {
 	return this.getClass().getSimpleName() + "(" + alpha + ","+beta+")";
-}
+}*/
 }
