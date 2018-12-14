@@ -60,7 +60,7 @@ public class UtilityMethods {
         }
 
         try {
-            Files.write(Paths.get(directory + File.separator + name + "_result.txt"),
+            Files.write(Paths.get(directory + File.separator + name + "_result.csv"),
                     str.toString().getBytes());
         } catch (Exception ex) {
             System.err.println("Front file error: " + ex.getLocalizedMessage());

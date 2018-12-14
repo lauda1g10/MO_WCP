@@ -115,7 +115,7 @@ public class MainEvolutive {
             double[] results = new double[runs];
 
             for (int i = 0; i < runs; i++) {
-                System.out.println("\n### Run " + (i + 1) + " - " + instance.getName());
+                System.out.println("\n### Run " + (i + 1) + " - " + inst + " - (" + ((System.currentTimeMillis() - start) / 1000) + " secs. running)");
                 // Second create the algorithm
                 NSGAII<PermutationSolution<Integer>> algorithm = new NSGAII<>(problem,generations,
                         population,crossover,mutation,selection,dominanceComparator,evaluator);
@@ -127,7 +127,7 @@ public class MainEvolutive {
 
                 // Print results of this run:
                 for (PermutationSolution<Integer> s : algorithm.getResult()) {
-                    System.out.println(problem.convert(s));
+                    System.out.print(problem.convert(s));
                 }
 
             }
