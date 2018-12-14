@@ -21,7 +21,7 @@ public class WCPRoute extends Route {
 	    }
 	public WCPRoute(WCPRoute r) {
 		super(r);
-		this.time = r.time;
+		this.time = r.getTime();
 	}
 	public void copy(WCPRoute r){
 		this.demand = r.demand;
@@ -76,23 +76,32 @@ public class WCPRoute extends Route {
 	}
 
 	public double evalTimeMove2Opt(int start, int end) {
-		double extractCost =  instance.getTime(getNodeAt(start - 1), getNodeAt(start))
-				+  instance.getTime(getNodeAt(end), getNodeAt(end + 1));
-		double insertCost =  instance.getTime(getNodeAt(start - 1), getNodeAt(end))
-				+  instance.getTime(getNodeAt(start), getNodeAt(end + 1));
+		double extractCost = instance.getTime(getNodeAt(start - 1), getNodeAt(start))
+				+ instance.getTime(getNodeAt(end), getNodeAt(end + 1));
+		double insertCost = instance.getTime(getNodeAt(start - 1), getNodeAt(end))
+				+ instance.getTime(getNodeAt(start), getNodeAt(end + 1));
 		extractCost += this.timeBetween(start, end);
 		insertCost += this.reverseTimeBetween(start, end);
-		
+		// COMPROBACIÓN
+		/*WCPRoute rt = new WCPRoute(this);
+		Collections.reverse(rt.route.subList(start, end + 1));
+		rt.evaluateNaiveTime();
+		if (Math.abs(this.getTime() - extractCost + insertCost - rt.getTime()) > CVRPInstance.EPSILON) {
+			System.out.println("ERROR en 2-opt con diferencia = " + Math.abs(this.getTime() - extractCost + insertCost - rt.getTime()));
+		}*/
 		return getTime() - extractCost + insertCost;
 	}
 
 	public double timeBetween(int start, int end) {
-		double dist = 0;
+		double dist = WCPInstance.loadingTime;
 		for (int i = start; i < end; i++) {
 			dist += instance.getTime(route.get(i), route.get(i + 1))+WCPInstance.loadingTime;
 		}
 		if (start == 0){
-			return dist-WCPInstance.loadingTime;
+			dist-=WCPInstance.loadingTime;
+		}
+		if (end == this.size()-1){
+			dist-=WCPInstance.loadingTime;
 		}
 		return dist;
 	}
@@ -100,9 +109,9 @@ public class WCPRoute extends Route {
 	public double reverseTimeBetween(int start, int end) {
 		double dist = 0;
 		for (int i = end; i > start; i--) {
-			dist += instance.getTime(this.getNodeAt(i), this.getNodeAt(i - 1));
+			dist += instance.getTime(this.getNodeAt(i), this.getNodeAt(i - 1))+WCPInstance.loadingTime;
 		}
-		return dist + (end - start + 1) * WCPInstance.loadingTime;
+		return dist+WCPInstance.loadingTime;
 	}
 
 	public void removeSubRoute(int start, int end, double newDistance, double newTime) {
@@ -110,7 +119,7 @@ public class WCPRoute extends Route {
 		this.time = newTime;
 	}
 	public double evalTimeRemove(int p){
-		return this.getTime()+instance.getTime(this.getNodeAt(p-1),this.getNodeAt(p+1))-instance.getTime(this.getNodeAt(p-1),this.getNodeAt(p))-instance.getTime(this.getNodeAt(p),this.getNodeAt(p+1));
+		return this.getTime()+instance.getTime(this.getNodeAt(p-1),this.getNodeAt(p+1))-instance.getTime(this.getNodeAt(p-1),this.getNodeAt(p))-instance.getTime(this.getNodeAt(p),this.getNodeAt(p+1))-WCPInstance.loadingTime;
 	}
 	
 	public void removeSubRoute(int start, double newDistance, double newTime) {
@@ -143,8 +152,9 @@ public void setTime(double t){
 	}
 
 	public void evaluateNaive() {
-		this.distance = this.distanceBetween(0, this.size() - 1);
 		this.demand = 0;
+		this.distance = this.distanceBetween(0, this.size() - 1);
+		
 	}
 	public void evaluateNaiveTime() {
 		this.time = this.timeBetween(0, this.size() - 1);

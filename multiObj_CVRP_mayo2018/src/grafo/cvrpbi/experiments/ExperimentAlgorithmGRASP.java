@@ -7,16 +7,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import grafo.cvrpbi.algorithms.IteratedGreedy_Multi_WCK;
-import grafo.cvrpbi.algorithms.VNS_refOpt2;
+import grafo.cvrpbi.algorithms.AlgConstWCK_Multi_LS;
+import grafo.cvrpbi.algorithms.PathRelinking_length;
 import grafo.cvrpbi.constructive.C1;
 import grafo.cvrpbi.constructive.C1_LR;
 import grafo.cvrpbi.constructive.C1_TIME;
 import grafo.cvrpbi.constructive.C1_WCK;
-import grafo.cvrpbi.constructive.IteratedGreedy_GreedyGreedy;
-import grafo.cvrpbi.constructive.IteratedGreedy_GreedyRandom;
-import grafo.cvrpbi.constructive.IteratedGreedy_RandomGreedy;
-import grafo.cvrpbi.constructive.IteratedGreedy_RandomRandom;
 import grafo.cvrpbi.improvements.BLSIntra2Opt;
 import grafo.cvrpbi.improvements.BLS_1to0;
 import grafo.cvrpbi.improvements.BLS_1to1;
@@ -26,10 +22,6 @@ import grafo.cvrpbi.improvements.FLS_1to1;
 import grafo.cvrpbi.improvements.VNS_2opt;
 import grafo.cvrpbi.improvements.VNS_interchange;
 import grafo.cvrpbi.improvements.VNS_move1_0;
-import grafo.cvrpbi.improvements.multi.BMLSIntra2OptrefL2;
-import grafo.cvrpbi.improvements.multi.BMLS_1to0refL2;
-import grafo.cvrpbi.improvements.multi.BMLS_1to1refL2;
-import grafo.cvrpbi.improvements.multi.MultiLS_ref;
 import grafo.cvrpbi.structure.CoverageMetric;
 import grafo.cvrpbi.structure.WCPInstance;
 import grafo.cvrpbi.structure.WCPInstanceFactory;
@@ -41,7 +33,7 @@ import grafo.optilib.results.Experiment;
 /**
  * Created by jesussanchezoro on 05/10/2017.
  */
-public class ExperimentAlgorithm {
+public class ExperimentAlgorithmGRASP {
 
 	public static int indexAlg = 0;
 	public static int getAlgIndex() {
@@ -58,11 +50,10 @@ public class ExperimentAlgorithm {
         int year = cal.get(Calendar.YEAR);
 
         String date = String.format("%04d-%02d-%02d", year, month, day);
-
         WCPInstanceFactory factory = new WCPInstanceFactory();
-        int construcciones = 50;
-		int maxIter = 5;
-		int lambdaIntervals = 10;
+        int construcciones = 100;
+		int maxIter = 10;
+		int lambdaIntervals = 20;
         String instanceSet = (args.length == 0) ? "prueba" : args[0];
         String dir ="./instancias/"+instanceSet;
         		        
@@ -71,8 +62,6 @@ public class ExperimentAlgorithm {
         File outDirCreator = new File(outDir);
         outDirCreator.mkdirs();
         String[] extensions = new String[]{".txt"};
-      
-        
      // constructores
      		C1 c1 = new C1(-1);
      		C1_LR c2 = new C1_LR(-1);
@@ -82,7 +71,7 @@ public class ExperimentAlgorithm {
 
      	
      		double beta = 0.05;
-     //búsquedas locales single objective.
+     //búsquedas locales.
      		Improvement<WCPSolution>[] bls = new Improvement[3];
      		bls[0] = new BLS_1to1();
      		bls[1] = new BLSIntra2Opt();
@@ -100,51 +89,36 @@ public class ExperimentAlgorithm {
      	Improvement<WCPSolution> vns_interchangeR = new VNS_interchange(fls,0.03);
      	Improvement<WCPSolution> vns1to0R = new VNS_move1_0(fls,0.03);
      
-     	//Improvement<WCPSolution> vnsCombi2opt = new VNS_combi_2opt(ls,0.03);
-     	//Improvement<WCPSolution> vnsCombiInterchange = new VNS_combi_1to1(ls,0.03);
-     	//Improvement<WCPSolution> vnsCombi1to0 = new VNS_combi_1to0(ls,0.03);
      	
-     	//vns.add(vns2opt);
-     	//vns.add(vns_interchange);
-     	//vns.add(vns1to0);
-        
+     	
      	vns.add(vns2opt);
      	vns.add(vns_interchange);
      	vns.add(vns1to0);
-     	
-     	//busquedas locales multiobjc
-     	Improvement<WCPSolution>[] mls = new Improvement[3];
-     	mls[0] = new BMLS_1to0refL2();
-     	mls[1] = new BMLS_1to1refL2();
-     	mls[2] = new BMLSIntra2OptrefL2();
-     	MultiLS_ref multiLS = new MultiLS_ref(mls);
-     	
-     	double[] alpha = new double[]{0.1,0.25,0.5};
+     /*	vns.add(vns2optR);
+     	vns.add(vns_interchangeR);
+     	vns.add(vns1to0R);*/
      		//algoritmos		
+     	/*
      		 List<Algorithm<WCPInstance>> l = new ArrayList<>();
-     	       for(double a: alpha){
-     	    	IteratedGreedy_RandomGreedy igRG = new IteratedGreedy_RandomGreedy(c1,a,beta,maxIter);
-     	   		IteratedGreedy_GreedyGreedy igGG = new IteratedGreedy_GreedyGreedy(c1,a,beta,maxIter);
-     	   		IteratedGreedy_GreedyRandom igGR = new IteratedGreedy_GreedyRandom(c1,a,beta,maxIter);
-     	   		IteratedGreedy_RandomRandom igRR = new IteratedGreedy_RandomRandom(c1,a,beta,maxIter);
      	   		for(Improvement<WCPSolution> v:vns){
-     	          l.add(new VNS_refOpt2(new IteratedGreedy_Multi_WCK(c1,c2,c3,cW,lambdaIntervals,construcciones,igRG,v)));
-     	         l.add(new VNS_refOpt2(new IteratedGreedy_Multi_WCK(c1,c2,c3,cW,lambdaIntervals,construcciones,igRR,v)));
-     	       // l.add(new VNS_refOpt2(new IteratedGreedy_Multi_WCK(c1,c2,c3,cW,lambdaIntervals,construcciones,igGG,v)));
-     	       //l.add(new VNS_refOpt2(new IteratedGreedy_Multi_WCK(c1,c2,c3,cW,lambdaIntervals,construcciones,igGR,v)));
+     	          l.add(new AlgConstWCK_Multi_LS(cW,c1,c2,c3,v,maxIter,lambdaIntervals));
      	   		}
-     	       }
-     	       Algorithm<WCPInstance>[] execution = l.toArray(new Algorithm[1]);
-     	       
+     	   	List<Algorithm<WCPInstance>> alg = new ArrayList<>();
+     	   	for(Algorithm<WCPInstance> a:l){
+     	   		alg.add(new PathRelinking_length(a));
+     	   	}
+     	       Algorithm<WCPInstance>[] execution = alg.toArray(new Algorithm[1]);
+     	       WCPInstance.indexSolution = 0;
      	        for (int i=0;i<execution.length;i++) {
      	        	String outputFile = outDir+"/"+instanceSet+"_"+execution[i].toString()+".xlsx";
      	            Experiment<WCPInstance, WCPInstanceFactory> experiment = new Experiment<WCPInstance, WCPInstanceFactory>(execution[i], factory);
      	            experiment.launch(dir, outputFile, extensions);
-     	        }
-        String paretoDir = "./pareto";
-        String[] files = new File(paretoDir).list();
-        for(String s:files){
-        	CoverageMetric.createExcel(paretoDir+"/"+s, outDir+"/ContrasteIteratedGreedySept2018.csv");
+     	            WCPInstance.incrementIndex();
+     	        }*/
+     	       String paretoDir = "./pareto";
+     	        String[] files = new File(paretoDir).list();
+     	        for(String s:files){
+     	        	CoverageMetric.createExcel(paretoDir+"/"+s, outDir+"/ContrasteGRASPpr.csv");
      	        }   
     }
 }

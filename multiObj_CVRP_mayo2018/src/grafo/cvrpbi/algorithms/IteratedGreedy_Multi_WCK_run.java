@@ -14,7 +14,7 @@ import grafo.optilib.results.Result;
 import grafo.optilib.structure.Solution;
 import grafo.optilib.tools.Timer;
 
-public class IteratedGreedy_Multi_WCK implements Algorithm<WCPInstance> {
+public class IteratedGreedy_Multi_WCK_run implements Algorithm<WCPInstance> {
 
 	private ConstIteratedGreedy algIG;
 
@@ -28,7 +28,7 @@ public class IteratedGreedy_Multi_WCK implements Algorithm<WCPInstance> {
 	private C1_WCK c_W;
 	private double ratio = 1.15;
 
-	public IteratedGreedy_Multi_WCK(Constructive<WCPInstance, WCPSolution> c1,
+	public IteratedGreedy_Multi_WCK_run(Constructive<WCPInstance, WCPSolution> c1,
 			Constructive<WCPInstance, WCPSolution> c2, Constructive<WCPInstance, WCPSolution> c3, C1_WCK c_W,
 			int lambdas, int iters, ConstIteratedGreedy iteratedG, Improvement<WCPSolution> ls) {
 		this.c1 = c1;
@@ -42,8 +42,10 @@ public class IteratedGreedy_Multi_WCK implements Algorithm<WCPInstance> {
 	}
 
 	public Result execute(WCPInstance instance) {
-		Result r = new Result("");
+		Pareto.reset();
+		Result r = new Result(instance.getName());
 		System.out.print(instance.getName() + "\t");
+		Timer.initTimer();
 		double[] min = new double[4];
 		double[] max = new double[4];
 		min[3] = instance.numVeh();
@@ -196,7 +198,7 @@ public class IteratedGreedy_Multi_WCK implements Algorithm<WCPInstance> {
 
 	@Override
 	public String toString() {
-		return WCPInstance.indexSolution +"IG"+ lambdaIntervals+"(" + algIG.toString() + " "+ls+")";
+		return WCPInstance.indexSolution+"IteratedGreedy" + lambdaIntervals+"(" + algIG + " "+ls+")";
 	}
 
 }

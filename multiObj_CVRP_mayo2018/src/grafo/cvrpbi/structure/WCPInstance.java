@@ -25,7 +25,17 @@ public class WCPInstance implements Instance {
 	public static double loadingTime = 120;// 2 minutos = 120 s
 	public static int currentVehicles;
 	private int numVehMax;
-    
+	public static int indexSolution;
+	
+	public void setIndex(int k){
+		indexSolution = k;
+	}
+	public int getIndex(){
+		return indexSolution;
+	}
+	public static void incrementIndex(){
+		indexSolution++;
+	}
     public WCPInstance(String path) {
         readInstance(path);
         currentVehicles = vehicles;
@@ -179,5 +189,9 @@ public class WCPInstance implements Instance {
         }
         return stb.toString();
     }
+	public void incrementRoute() {
+		this.vehicles = this.vehicles+1;
+		
+	}
 }
 

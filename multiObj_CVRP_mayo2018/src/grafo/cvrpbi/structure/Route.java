@@ -56,7 +56,7 @@ public class Route {
 					+ instance.getDistance(getNodeAt(dst - 1), getNodeAt(dst));
 		}
 		// COMPROBACIÓN
-	/*	Route aux = new Route(this);
+		/*Route aux = new Route(this);
 		List<Integer> subList = new ArrayList<>(aux.route.subList(start, end + 1));
 		if (dst < start) {
 			aux.route.removeAll(subList);

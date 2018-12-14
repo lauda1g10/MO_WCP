@@ -25,7 +25,7 @@ public class CRandom implements Constructive<WCPInstance, WCPSolution> {
             cl.add(v);
         }
         Collections.shuffle(cl, rnd);
-        int nRoutes = instance.getVehicles();
+        int nRoutes = WCPInstance.currentVehicles;
         List<Integer> routes = new ArrayList<>(nRoutes);
         for (int i = 0; i < nRoutes; i++) {
             routes.add(i);
@@ -50,10 +50,12 @@ public class CRandom implements Constructive<WCPInstance, WCPSolution> {
         		Collections.shuffle(cl, rnd);
         		 Collections.shuffle(routes, rnd);
         		 incomplete = true;
+        		 iter++;
         	}
         	}
-        sol.findLongestRoute();
-        sol.findTimes();
+        if ( iter == 100){
+        	sol=null;
+        }
         return sol;
     }
 }

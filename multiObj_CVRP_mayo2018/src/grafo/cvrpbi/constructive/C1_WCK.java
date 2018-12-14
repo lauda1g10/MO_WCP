@@ -247,24 +247,27 @@ public static void setNadir(double[] i){
 		return reg;
 	}
 
-	public void setLambda(double l1, double l2) {
-		lambda[0] = l1;
-		lambda[1] = l2;
-		lambda[1] = (1-lambda[0])*(lambda[1]-1)+(1-lambda[0]);//normalizamos lambda2
-		lambda[2] = 1-(lambda[0]+lambda[1]);
-	}
-
-	public void setIdeal1(double i1) {
+	public static void setIdeal1(double i1) {
 		ideal[0] = i1;
 	}
 
-	public void setIdeal2(double i2) {
+	public static void setIdeal2(double i2) {
 		ideal[1] = i2;
 	}
-	public void setIdeal3(double i3) {
+	public static void setIdeal3(double i3) {
 		ideal[2] = i3;
 	}
+	public static void setNadir1(double n1) {
+		nadir[0] = n1;
+	}
 
+	public static void setNadir2(double n2) {
+		nadir[1] = n2;
+	}
+	public static void setNadir3(double n3) {
+		nadir[2] = n3;
+	}
+	
 	public void setLambda(){
 	Random rnd = RandomManager.getRandom();
 	double suma = 0;
@@ -284,16 +287,29 @@ public static void setNadir(double[] i){
 	public double getLambda3() {
 		return 1-lambda[0]-lambda[1];
 	}
-	public double getIdeal1() {
+	public static double getIdeal1() {
 		return ideal[0];
 	}
 
-	public double getIdeal2() {
+	public static double getIdeal2() {
 		return ideal[1];
 	}
-	public double getIdeal3() {
+	public static double getIdeal3() {
 		return ideal[2];
 	}
+	
+	public static double getNadir1() {
+		return nadir[0];
+	}
+	
+	public static double getNadir2() {
+		return nadir[1];
+	}
+	public static double getNadir3() {
+		return nadir[2];
+	}
+	
+	
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName() + "(" + alpha + ")";
