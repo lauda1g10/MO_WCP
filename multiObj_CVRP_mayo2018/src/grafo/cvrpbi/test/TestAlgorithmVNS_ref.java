@@ -82,7 +82,7 @@ public class TestAlgorithmVNS_ref {
 	     		fls[1] = new FLSIntra2Opt();
 	     		fls[2] = new FLS_1to0();
 	     		List<Improvement<WCPSolution>> vns = new ArrayList<>();
-	     		String path = "./instancias/X-n837-k142vrp.txt";
+	     		String path = "./instancias/X-n101-k25vrp.txt";
 	     		WCPInstance instance = new WCPInstance(path);
 	     		
 	     	Improvement<WCPSolution> vns2opt = new VNS_2opt(bls,0.03);
@@ -101,7 +101,7 @@ public class TestAlgorithmVNS_ref {
 	     	mls[2] = new BMLSIntra2OptrefL2();
 	     	MultiLS_ref multiLS = new MultiLS_ref(mls);
 	     	
-	     	double a = 0.5;//,0.25,0.5;
+	     	double a = 0.1;
 	     		//algoritmos		
 	     	    	IteratedGreedy_RandomGreedy igRG = new IteratedGreedy_RandomGreedy(c1,a,beta,maxIter);
 	     	   		IteratedGreedy_GreedyGreedy igGG = new IteratedGreedy_GreedyGreedy(c1,a,beta,maxIter);

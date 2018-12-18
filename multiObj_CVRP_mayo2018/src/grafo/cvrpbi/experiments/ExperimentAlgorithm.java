@@ -119,18 +119,18 @@ public class ExperimentAlgorithm {
      	mls[2] = new BMLSIntra2OptrefL2();
      	MultiLS_ref multiLS = new MultiLS_ref(mls);
      	
-     	double[] alpha = new double[]{0.1,0.25,0.5};
+     	double[] alpha = new double[]{0.1,0.25,0.50};
      		//algoritmos		
      		 List<Algorithm<WCPInstance>> l = new ArrayList<>();
      	       for(double a: alpha){
      	    	IteratedGreedy_RandomGreedy igRG = new IteratedGreedy_RandomGreedy(c1,a,beta,maxIter);
      	   		IteratedGreedy_GreedyGreedy igGG = new IteratedGreedy_GreedyGreedy(c1,a,beta,maxIter);
-     	   		IteratedGreedy_GreedyRandom igGR = new IteratedGreedy_GreedyRandom(c1,a,beta,maxIter);
-     	   		IteratedGreedy_RandomRandom igRR = new IteratedGreedy_RandomRandom(c1,a,beta,maxIter);
+     	   		//IteratedGreedy_GreedyRandom igGR = new IteratedGreedy_GreedyRandom(c1,a,beta,maxIter);
+     	   		//IteratedGreedy_RandomRandom igRR = new IteratedGreedy_RandomRandom(c1,a,beta,maxIter);
      	   		for(Improvement<WCPSolution> v:vns){
      	          l.add(new VNS_refOpt2(new IteratedGreedy_Multi_WCK(c1,c2,c3,cW,lambdaIntervals,construcciones,igRG,v)));
-     	         l.add(new VNS_refOpt2(new IteratedGreedy_Multi_WCK(c1,c2,c3,cW,lambdaIntervals,construcciones,igRR,v)));
-     	       // l.add(new VNS_refOpt2(new IteratedGreedy_Multi_WCK(c1,c2,c3,cW,lambdaIntervals,construcciones,igGG,v)));
+     	       //  l.add(new VNS_refOpt2(new IteratedGreedy_Multi_WCK(c1,c2,c3,cW,lambdaIntervals,construcciones,igRR,v)));
+     	        l.add(new VNS_refOpt2(new IteratedGreedy_Multi_WCK(c1,c2,c3,cW,lambdaIntervals,construcciones,igGG,v)));
      	       //l.add(new VNS_refOpt2(new IteratedGreedy_Multi_WCK(c1,c2,c3,cW,lambdaIntervals,construcciones,igGR,v)));
      	   		}
      	       }
@@ -141,10 +141,11 @@ public class ExperimentAlgorithm {
      	            Experiment<WCPInstance, WCPInstanceFactory> experiment = new Experiment<WCPInstance, WCPInstanceFactory>(execution[i], factory);
      	            experiment.launch(dir, outputFile, extensions);
      	        }
+     	        /*
         String paretoDir = "./pareto";
         String[] files = new File(paretoDir).list();
         for(String s:files){
         	CoverageMetric.createExcel(paretoDir+"/"+s, outDir+"/ContrasteIteratedGreedySept2018.csv");
-     	        }   
+     	        } */  
     }
 }
