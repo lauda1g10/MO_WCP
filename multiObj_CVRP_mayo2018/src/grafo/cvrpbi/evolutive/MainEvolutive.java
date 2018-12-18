@@ -94,6 +94,10 @@ public class MainEvolutive {
             System.out.println("\nReading instance: " + inst);
             WCPInstance instance = new WCPInstance(dir + File.separator + inst);
 
+            // Use this element to control the number of vehicles:
+//            WCPInstance.currentVehicles;
+
+
             // Create the problem
             CVRPProblem problem = new CVRPProblem(instance,alpha);
 

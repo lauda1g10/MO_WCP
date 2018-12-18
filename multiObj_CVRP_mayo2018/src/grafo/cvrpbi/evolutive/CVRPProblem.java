@@ -157,7 +157,8 @@ public class CVRPProblem<T extends Constructive<WCPInstance, WCPSolution>> exten
     public static void main(String[] args) {
         RandomManager.setSeed(1234);
 
-        WCPInstance inst = new WCPInstance("instancias/CMT1_vrp.txt");
+        WCPInstance inst = new WCPInstance("todas-instancias/CMT1_vrp.txt");
+//        WCPInstance.currentVehicles++;
 
         CVRPProblem problem = new CVRPProblem(inst, 0.5);
 
