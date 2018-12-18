@@ -1,6 +1,8 @@
 package grafo.cvrpbi.evolutive;
 
 import grafo.cvrpbi.constructive.C1;
+import grafo.cvrpbi.constructive.C1_LR;
+import grafo.cvrpbi.constructive.C1_TIME;
 import grafo.cvrpbi.structure.WCPInstance;
 import grafo.cvrpbi.structure.WCPRoute;
 import grafo.cvrpbi.structure.WCPSolution;
@@ -21,9 +23,11 @@ public class CVRPProblem<T extends Constructive<WCPInstance, WCPSolution>> exten
     public static final String ROUTES = "Routes";
 
     protected WCPInstance instance;
-    protected T constructive;
+    protected Constructive<WCPInstance, WCPSolution> constructiveObj0;
+    protected Constructive<WCPInstance, WCPSolution> constructiveObj1;
+    protected Constructive<WCPInstance, WCPSolution> constructiveObj2;
 
-    public CVRPProblem(WCPInstance instance,T constructive) {
+    public CVRPProblem(WCPInstance instance,double alpha) {
 
         // An instance with N nodes indicates that N-1 are the customers.
         // Therefore, we will deal with elements from 1 to N-1.
@@ -33,13 +37,30 @@ public class CVRPProblem<T extends Constructive<WCPInstance, WCPSolution>> exten
         setName("MultiobjectiveGeneticCVRP");
 
         this.instance = instance;
-        this.constructive = constructive;
+
+        // Create the array of constructive methods:
+        this.constructiveObj0 = new C1(alpha);
+        this.constructiveObj1 = new C1_LR(alpha);
+        this.constructiveObj2 = new C1_TIME(alpha);
 
     }
 
 
     @Override
     public PermutationSolution<Integer> createSolution() {
+
+        Constructive<WCPInstance, WCPSolution> constructive;
+        double rnd = random.nextDouble();
+
+        if (rnd >= 0.666) {
+            constructive = constructiveObj2;
+        } else {
+            if (rnd >= 0.333) {
+                constructive = constructiveObj1;
+            } else {
+                constructive = constructiveObj0;
+            }
+        }
 
         // Create a solution with the constructive algorithm and translate it to a jMetal solution.
         WCPSolution sol = constructive.constructSolution(instance);
@@ -138,7 +159,7 @@ public class CVRPProblem<T extends Constructive<WCPInstance, WCPSolution>> exten
 
         WCPInstance inst = new WCPInstance("instancias/CMT1_vrp.txt");
 
-        CVRPProblem problem = new CVRPProblem(inst, new C1(0.5));
+        CVRPProblem problem = new CVRPProblem(inst, 0.5);
 
         PermutationSolution jmSol = problem.createSolution();
         WCPSolution testSol2 = problem.convert(jmSol);

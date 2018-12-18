@@ -69,25 +69,13 @@ public class MainEvolutive {
         DominanceComparator<PermutationSolution<Integer>> dominanceComparator = new DominanceComparator();
         SequentialSolutionListEvaluator<PermutationSolution<Integer>> evaluator = new SequentialSolutionListEvaluator();
 
-
-        // Constructive algorithm (for initial population)
-        Constructive<WCPInstance, WCPSolution> constructive;
-        String constructiveId = props.getProperty("ConstructiveAlgorithm");
-        if (constructiveId != null) {
-            switch (constructiveId) {
-                case "C1":
-                    double alpha = Double.valueOf(props.getProperty("Alpha"));
-                    constructive = new C1(alpha);
-                    break;
-                default:
-                    // Default constructive algorithm
-                    constructive = new C1(0.5);
-            }
-        } else {
-            // Default constructive algorithm
-            constructive = new C1(0.5);
+        double alpha = 0.5;
+        try {
+            alpha = Double.valueOf(props.getProperty("Alpha"));
+        } catch (NullPointerException e) {
+            // If no alpha, 0.5 is used
+            System.out.println("\n --> No Alpha property is defined. Value set to 0.5.\n");
         }
-
 
         for (String inst : instances) {
 /*
@@ -107,7 +95,7 @@ public class MainEvolutive {
             WCPInstance instance = new WCPInstance(dir + File.separator + inst);
 
             // Create the problem
-            CVRPProblem problem = new CVRPProblem(instance,constructive);
+            CVRPProblem problem = new CVRPProblem(instance,alpha);
 
             // Solutions from all executions
             ArrayList<PermutationSolution<Integer>> bestSolutions = new ArrayList<>();

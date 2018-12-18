@@ -2,3 +2,4 @@
 *.iml
 .DS_Store
 multiObj_CVRP_mayo2018/bin/
+*.class
