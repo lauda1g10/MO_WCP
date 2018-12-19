@@ -57,6 +57,14 @@ public class MainEvolutive {
         String dir = props.getProperty("InstancesDirectory");
         String outDir = props.getProperty("ResultsDirectory");
 
+        int testedVehiclesIterations = 1;
+        try {
+            testedVehiclesIterations = Integer.parseInt(props.getProperty("TestedVehiclesIterations"));
+        } catch (NullPointerException e) {
+            System.out.println("\n --> No TestedVehiclesIterations property is defined. Value set to 1.\n");
+        }
+
+
         List<String> instances = obtainFiles(dir);
 
         String propertiesAsString = executionDataAsString(props);
@@ -106,20 +114,27 @@ public class MainEvolutive {
 
             double[] results = new double[runs];
 
-            for (int i = 0; i < runs; i++) {
-                System.out.println("\n### Run " + (i + 1) + " - " + inst + " - (" + ((System.currentTimeMillis() - start) / 1000) + " secs. running)");
-                // Second create the algorithm
-                NSGAII<PermutationSolution<Integer>> algorithm = new NSGAII<>(problem,generations,
-                        population,crossover,mutation,selection,dominanceComparator,evaluator);
+            for (int j = 0; j < testedVehiclesIterations; j++) {
 
-                algorithm.run();
+                if (j>0) WCPInstance.currentVehicles++;
 
-                // Collect solutions
-                bestSolutions.addAll(algorithm.getResult());
+                for (int i = 0; i < runs; i++) {
+                    
+                    System.out.println("\n### Run " + (i + 1) + " - " + inst + " - "+ WCPInstance.currentVehicles +" vehicles - (" + ((System.currentTimeMillis() - start) / 1000) + " secs. running)");
+                    // Second create the algorithm
+                    NSGAII<PermutationSolution<Integer>> algorithm = new NSGAII<>(problem,generations,
+                            population,crossover,mutation,selection,dominanceComparator,evaluator);
 
-                // Print results of this run:
-                for (PermutationSolution<Integer> s : algorithm.getResult()) {
-                    System.out.print(problem.convert(s));
+                    algorithm.run();
+
+                    // Collect solutions
+                    bestSolutions.addAll(algorithm.getResult());
+
+                    // Print results of this run:
+                    for (PermutationSolution<Integer> s : algorithm.getResult()) {
+                        System.out.print(problem.convert(s));
+                    }
+
                 }
 
             }
