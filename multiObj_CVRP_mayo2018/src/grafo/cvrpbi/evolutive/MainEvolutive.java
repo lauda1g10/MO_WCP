@@ -119,7 +119,7 @@ public class MainEvolutive {
                 if (j>0) WCPInstance.currentVehicles++;
 
                 for (int i = 0; i < runs; i++) {
-                    
+
                     System.out.println("\n### Run " + (i + 1) + " - " + inst + " - "+ WCPInstance.currentVehicles +" vehicles - (" + ((System.currentTimeMillis() - start) / 1000) + " secs. running)");
                     // Second create the algorithm
                     NSGAII<PermutationSolution<Integer>> algorithm = new NSGAII<>(problem,generations,
