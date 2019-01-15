@@ -141,16 +141,21 @@ public class MainEvolutive {
                                     population,crossover,mutation,selection,dominanceComparator,evaluator);
                     }
 
-                    algorithm.run();
+                    // TODO: fix error in C1_LR that produces NullPointerException
+                    try {
+                        algorithm.run();
 
-                    // Collect solutions
-                    bestSolutions.addAll(algorithm.getResult());
+                        // Collect solutions
+                        bestSolutions.addAll(algorithm.getResult());
 
-                    // Print results of this run:
-                    for (PermutationSolution<Integer> s : algorithm.getResult()) {
-                        System.out.print(problem.convert(s));
+                        // Print results of this run:
+                        for (PermutationSolution<Integer> s : algorithm.getResult()) {
+                            System.out.print(problem.convert(s));
+                        }
+
+                    } catch (NullPointerException ex) {
+                        System.out.println("Error processing instance "+inst);
                     }
-
                 }
 
             }
