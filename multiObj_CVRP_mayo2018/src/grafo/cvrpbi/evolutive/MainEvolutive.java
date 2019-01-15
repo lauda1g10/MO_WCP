@@ -34,11 +34,6 @@ public class MainEvolutive {
 
     public static void main(String[] args) {
 
-        RandomManager.setSeed(1234);
-
-        args = new String[1];
-        args[0] = "nsgaii.properties";
-
         if (args.length < 1) {
             System.err.println("\nERROR: No properties file was provided.\n");
             System.out.println("--> java -jar MultiCVRP.jar nsgaii.properties\n");
@@ -46,6 +41,14 @@ public class MainEvolutive {
         }
 
         Properties props = loadProperties(args[0]);
+
+        // Random Seed:
+        int randomSeed = 1234;
+        if (props.getProperty("RandomSeed") != null) {
+            randomSeed = Integer.valueOf(props.getProperty("RandomSeed"));
+        }
+
+        RandomManager.setSeed(randomSeed);
 
         // Parameters:
         int population = Integer.valueOf(props.getProperty("Population"));
