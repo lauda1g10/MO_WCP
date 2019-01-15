@@ -3,3 +3,5 @@
 .DS_Store
 multiObj_CVRP_mayo2018/bin/
 *.class
+*.MF
+out/production/
