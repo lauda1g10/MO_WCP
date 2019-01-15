@@ -1,17 +1,13 @@
 package grafo.cvrpbi.evolutive;
 
-import grafo.cvrpbi.constructive.C1;
-import grafo.cvrpbi.structure.CVRPInstance;
 import grafo.cvrpbi.structure.WCPInstance;
-import grafo.cvrpbi.structure.WCPSolution;
-import grafo.optilib.metaheuristics.Constructive;
 import grafo.optilib.tools.RandomManager;
-import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.algorithm.impl.AbstractGeneticAlgorithm;
 import org.uma.jmetal.algorithm.multiobjective.nsgaii.NSGAII;
+import org.uma.jmetal.algorithm.multiobjective.nsgaiii.NSGAIII;
+import org.uma.jmetal.algorithm.multiobjective.nsgaiii.NSGAIIIBuilder;
 import org.uma.jmetal.algorithm.multiobjective.spea2.SPEA2;
 import org.uma.jmetal.operator.impl.crossover.PMXCrossover;
-import org.uma.jmetal.operator.impl.mutation.PermutationSwapMutation;
 import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
 import org.uma.jmetal.solution.PermutationSolution;
 import org.uma.jmetal.util.SolutionListUtils;
@@ -20,8 +16,6 @@ import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
 import org.uma.jmetal.util.evaluator.impl.SequentialSolutionListEvaluator;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -131,6 +125,16 @@ public class MainEvolutive {
                     switch (alg) {
                         case "SPEA2":
                             algorithm = new SPEA2<>(problem,generations,population,crossover,mutation,selection,evaluator);
+                            break;
+                        case "NSGAIII":
+                            NSGAIIIBuilder<PermutationSolution<Integer>> builder = new NSGAIIIBuilder<>(problem);
+                            builder.setCrossoverOperator(crossover);
+                            builder.setMaxIterations(generations);
+                            builder.setMutationOperator(mutation);
+                            builder.setPopulationSize(population);
+                            builder.setSelectionOperator(selection);
+                            builder.setSolutionListEvaluator(evaluator);
+                            algorithm = new NSGAIII<>(builder);
                             break;
                         default:
                             algorithm = new NSGAII<>(problem,generations,
