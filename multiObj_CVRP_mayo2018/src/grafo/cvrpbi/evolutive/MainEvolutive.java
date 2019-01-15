@@ -6,7 +6,10 @@ import grafo.cvrpbi.structure.WCPInstance;
 import grafo.cvrpbi.structure.WCPSolution;
 import grafo.optilib.metaheuristics.Constructive;
 import grafo.optilib.tools.RandomManager;
+import org.uma.jmetal.algorithm.Algorithm;
+import org.uma.jmetal.algorithm.impl.AbstractGeneticAlgorithm;
 import org.uma.jmetal.algorithm.multiobjective.nsgaii.NSGAII;
+import org.uma.jmetal.algorithm.multiobjective.spea2.SPEA2;
 import org.uma.jmetal.operator.impl.crossover.PMXCrossover;
 import org.uma.jmetal.operator.impl.mutation.PermutationSwapMutation;
 import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
@@ -51,6 +54,7 @@ public class MainEvolutive {
         RandomManager.setSeed(randomSeed);
 
         // Parameters:
+        String alg = props.getProperty("Algorithm");
         int population = Integer.valueOf(props.getProperty("Population"));
         int generations = Integer.valueOf(props.getProperty("Generations"));
         double cxProb = Double.valueOf(props.getProperty("CrossoverProb"));
@@ -115,8 +119,6 @@ public class MainEvolutive {
             // Solutions from all executions
             ArrayList<PermutationSolution<Integer>> bestSolutions = new ArrayList<>();
 
-            double[] results = new double[runs];
-
             for (int j = 0; j < testedVehiclesIterations; j++) {
 
                 if (j>0) WCPInstance.currentVehicles++;
@@ -125,8 +127,15 @@ public class MainEvolutive {
 
                     System.out.println("\n### Run " + (i + 1) + " - " + inst + " - "+ WCPInstance.currentVehicles +" vehicles - (" + ((System.currentTimeMillis() - start) / 1000) + " secs. running)");
                     // Second create the algorithm
-                    NSGAII<PermutationSolution<Integer>> algorithm = new NSGAII<>(problem,generations,
-                            population,crossover,mutation,selection,dominanceComparator,evaluator);
+                    AbstractGeneticAlgorithm<PermutationSolution<Integer>, List<PermutationSolution<Integer>>> algorithm = null;
+                    switch (alg) {
+                        case "SPEA2":
+                            algorithm = new SPEA2<>(problem,generations,population,crossover,mutation,selection,evaluator);
+                            break;
+                        default:
+                            algorithm = new NSGAII<>(problem,generations,
+                                    population,crossover,mutation,selection,dominanceComparator,evaluator);
+                    }
 
                     algorithm.run();
 
