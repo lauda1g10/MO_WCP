@@ -164,15 +164,19 @@ public class MainEvolutive {
 
             System.out.println("\nExec time (secs) for instance "+instance.getName()+" : "+end+"\n");
 
-            // Obtain non-dominated solutions from all executions:
-            List<PermutationSolution<Integer>> ndSols = SolutionListUtils.getNondominatedSolutions(bestSolutions);
+            // TODO: fix error in C1_LR that produces NullPointerException, may generate empty sets.
+            if (bestSolutions.size() > 0) {
 
-            if (outDir != null) {
+                // Obtain non-dominated solutions from all executions:
+                List<PermutationSolution<Integer>> ndSols = SolutionListUtils.getNondominatedSolutions(bestSolutions);
+
+                if (outDir != null) {
 //                writeStatsToFile(bestSolutions, instance.getName(), outDir);
 //                writeStatsToFile(results, instance.getName(), outDir);
-                writeFrontToFile(ndSols, inst, outDir);
-            }
+                    writeFrontToFile(ndSols, inst, outDir);
+                }
 
+            }
         }
 
     }
